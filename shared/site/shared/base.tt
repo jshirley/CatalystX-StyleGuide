@@ -1,0 +1,50 @@
+
+[%~
+
+MACRO ref(var) BLOCK;
+    var_ref = "$var";
+    var_ref.match('^([A-Z]+)\\(0x[0-9a-f]+\\)$').0;
+END;
+
+# Wraps c.uri_for to point to static resources either inside the
+# /root/static structure or explicit URIs.  Assumes 
+MACRO static(res, versioned, query) BLOCK;
+    uri_params = query || {};
+    IF res.match('^https?://') || res.match('^/');
+        res;
+    ELSIF versioned && static_build;
+        uri_params.ver = uri_params.ver || static_build;
+        c.uri_for( static_root, res, uri_params );
+    ELSE;
+        c.uri_for( static_root, res );
+    END;
+END;
+
+# Set up the default stash structure for the page
+IF !page || !ref(page) == 'HASH';
+    page = {};
+END;
+DEFAULT page.title  = '';
+DEFAULT page.description = 'An enlightened pastebin for standalone or project use.';
+DEFAULT page.layout = 'default';
+DEFAULT page.header = 'default';
+DEFAULT page.nav    = 'default';
+DEFAULT page.footer = 'default';
+DEFAULT page.language = c.config.language || 'en';
+DEFAULT page.head             = {};
+DEFAULT page.head.stylesheets = [
+    'http://yui.yahooapis.com/combo?3.0.0/build/cssreset/reset-min.css&3.0.0/build/cssfonts/fonts-min.css&3.0.0/build/cssbase/base-min.css'
+];
+DEFAULT page.head.scripts     = [];
+DEFAULT page.body             = {};
+DEFAULT page.body.classes     = ['yui-skin-sam'];
+DEFAULT page.body.scripts     = [
+    'http://yui.yahooapis.com/combo?3.0.0/build/yui/yui-min.js',
+];
+DEFAULT page.crumbs           = [];
+DEFAULT page.content_class    = 'content';
+
+# Include global macros/vars/set up per implementation
+TRY; PROCESS site/global.tt; CATCH file; END;
+
+~%]

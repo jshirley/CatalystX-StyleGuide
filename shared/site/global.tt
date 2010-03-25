@@ -1,0 +1,360 @@
+[%~
+USE Digest.MD5;
+
+MACRO form(params) BLOCK;
+    submit_label  = params.submit_label || c.loc('Save');
+    form_actions  = [];
+    form_scopes   = [];
+    form_contents = [];
+    FOREACH sec IN params.sections;
+        section = {};
+        content = PROCESS $sec;
+        output = content WRAPPER "site/wrappers/form.tt";
+        IF section.scope; form_scopes.push([ section.scope, section.title ]); END;
+        form_contents.push(output);
+        IF section.action.defined;
+            form_actions.push( section.action );
+        END;
+    END;
+    IF params.action; form_actions = [ params.action ]; END;
+    %]<h3>Actions: [% form_actions.unique.join(', ') %]</h3>[%
+    IF form_scopes.size > 0;
+        FOREACH sc IN form_scopes;
+            IF loop.first; "<ul>"; END %]
+            <li><a href="#scope_[% sc.0 %]">[% sc.1 | html %]</a></li>
+            [% IF loop.last; "</ul>"; END;
+        END;
+    END;
+    IF form_actions.unique.size == 1 %]
+      <form method="post" action="[% form_actions.0 %]">
+        <input type="hidden" name="_page.referrer" value="[% c.req.uri | html %]">
+        [% form_contents.join('') %]
+        <div class="button"><input type="submit" value="[% submit_label %]"></div>
+      </form>
+    [% ELSE;
+        form_contents.join('');
+    END;
+END;
+
+MACRO ad_slot(zone, slot) BLOCK;
+    %]<img src="[% c.static_uri("images/ads/ad_zone${zone}.png") %]">[%
+END;
+
+MACRO run_widget(name, args) BLOCK;
+  SET w = widget.load(name, args);
+  INCLUDE "widgets/${w.template}" args = w.run(args);
+END;
+
+MACRO select_field(info) BLOCK;
+    info.type = 'select';
+    render_field(info);
+END;
+
+MACRO country_field(info) BLOCK;
+    %][% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <p id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+     <label for="form_[% info.name %]">[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+     <select id="form_[% info.name %]" name="[% info.name %]">
+     [% PROCESS form/countries.tt %]
+     </select>
+     <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </p>[%
+END;
+
+MACRO password_field(info) BLOCK; 
+    info.type = 'password'; 
+    text_field(info); 
+END;
+
+MACRO text_field(info) BLOCK;
+    info.type = 'text';
+    render_field(info);
+END;
+
+MACRO render_single_field(info) BLOCK %]
+    <input type="[% info.type || 'text' %]" id="form_[% info.name %]" name="[% info.name %]" value="[% info.value || info.hint | html %]"
+        [%~ IF info.autocomplete == 0 %] autocomplete="false"[% END ~%]
+        [%~ IF info.disabled          %] disabled="disabled"[% END ~%]
+        [%~ IF info.maxlength         %] maxlength="[% info.maxlength %]"[% END ~%]
+        [%~ IF info.width             =%]
+            size="[% info.width %]" style="width: [% info.width %]em;"
+        [%~ END =%]
+        class="
+            [%~ IF hinted     %] hint[% END ~%]
+            [%~ IF info.focus %] focus[% END ~%]
+        ">
+    <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+[% END;
+
+MACRO render_textarea_field(info) BLOCK;
+    label_class.push('banner');
+%]
+    <textarea id="form_[% info.name %]" name="[% info.name %]"
+        [%~ IF info.autocomplete == 0 %] autocomplete="false"[% END ~%]
+        [%~ IF info.disabled          %] disabled="disabled"[% END ~%]
+        [%~ IF info.maxlength         %] maxlength="[% info.maxlength %]"[% END ~%]
+        [%~ IF info.width             =%]
+            size="[% info.width %]" style="width: [% info.width %]em;"
+        [%~ END =%]
+        class="
+            [%~ IF hinted     %] hint[% END ~%]
+            [%~ IF info.focus %] focus[% END ~%]
+        ">
+        [%~ info.value || info.hint | html ~%]
+    </textarea>
+    <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+[% END;
+
+MACRO render_select_field(info) BLOCK %]
+     <select id="form_[% info.name %]" name="[% info.name %]" style="width: auto">
+      [% IF info.default_option %]<option value="[% info.default_option.0 %]">[% info.default_option.1 %]</option>[% END %]
+      [% FOREACH item = info.array %]
+      [% IF info.value_method %]
+        [% SET this_value = item.${info.value_method}; %]
+      [% ELSE %]
+        [% SET this_value = item %]
+      [% END %]
+      <option value="[% this_value %]" [% IF this_value == info.value %]selected="selected"[% END %] >[% IF info.label_method; item.${info.label_method}; ELSE; item; END %]</option>
+      [% END %]
+     </select>
+    <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+[% END;
+
+MACRO render_field(info) BLOCK;
+    field_class   = [ 'text_group' ];
+    messages      = [];
+    message_class = [];
+    label_class = [];
+
+    IF info.optional;
+        field_class.push('optional');
+    END;
+    IF section.scope;
+        stack = message_stack.for_scope(section.scope).for_subject(info.name);
+        info.name = "${section.scope}.${info.name}";
+        IF stack.count;
+            label_class.push('attention');
+            FOREACH msg IN stack.messages;
+                messages.push({ type => msg.level, message => c.loc(msg.text || msg.id, [ msg.params ]) });
+                field_class.push(msg.level);
+            END;
+        END;
+    ELSIF info.message;
+        label_class.push('attention');
+        messages.push({ type => 'error', message => c.loc(info.message) });
+    END;
+
+    IF !info.value && info.hint;
+        hinted = 1;
+    END;
+
+
+    field_content = '';
+    IF info.type == 'textarea';
+        field_content = render_textarea_field(info);
+    ELSIF info.type == 'select';
+        field_content = render_select_field(info);
+    ELSIF info.type == 'date';
+        field_content = render_date_field(info);
+    ELSIF info.type == 'checkbox';
+        field_content = render_checkbox_group(info);
+    ELSIF info.type == 'radio';
+        field_content = render_checkbox_group(info);
+    ELSE;
+        field_content = render_single_field(info);
+    END;
+    %]
+    <div id="form_[% info.name %]_fields" class="[% field_class.join(' ') %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]" class="[% label_class.join(' ') %]">[% c.loc(info.label) %]: <span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        [% field_content %]
+        [% FOREACH message IN messages %]
+            [% IF loop.first %]<div class="messages">[% END %]
+            <p class="clear attention [% message.type %]">[% message.message %]</p>
+            [% IF loop.last %]</div>[% END %]
+        [% END %]
+    </div>[%
+END;
+
+MACRO textarea_field(info) BLOCK;
+    info.type = 'textarea';
+    render_field(info);
+END;
+
+MACRO readonly_field(info) BLOCK %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <p id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        <input type="hidden" id="form_[% info.name %]" name="[% info.name %]" value="[% info.value | html %]"/>
+        <span class="readonly">[% info.value %]</span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </p>[%
+END;
+
+MACRO display_field(info) BLOCK %]
+    [% IF info.optional != 0; info.optional = 1; END; %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <p id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        <span class="readonly" id="form_[% info.name %]">[% info.value %]</span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </p>[%
+END;
+
+
+MACRO checkbox_field(info) BLOCK %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <p id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        <input [% IF info.maxlength %]maxlength="[% info.maxlength %]"[% END %] [% IF info.width %]size="[% info.width %]"[% END %] type="[% info.type || 'checkbox' %]" id="form_[% info.name %]" name="[% info.name %]" value="[% info.value | html %]"
+            [%~ IF info.checked      == 1 %] checked="checked"[% END ~%]
+            [%~ IF info.disabled     == 1 %] disabled="disabled"[% END ~%]
+        />
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </p>[%
+END;
+
+MACRO radio_group(info) BLOCK; 
+    classes = [ 'label' ];
+    IF info.message; classes.push('attention'); END; %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <div id="form_[% info.name %]_fields" class="input_group[% IF info.optional %] optional[% END %]">
+        <div class="[% classes.join(' ') %]">[%= ~%]
+            [% c.loc(info.label) ~%]
+            <span class="required">
+                [%~ IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;
+                [%~ ELSE ~%]
+                    [%~ c.loc("FIELD REQUIRED SPLAT") ~%]
+                [%~ END ~%]
+            </span>[%= ~%]
+        </div>
+        <div class="options">
+        [%~ FOREACH key IN info.values.keys ~%]
+            <label class="radio-label">
+                <input [% IF info.maxlength %]maxlength="[% info.maxlength %]"[% END %] [% IF info.width %]size="[% info.width %]"[% END %] type="[% info.type || 'radio' %]" id="form_[% info.name %]_[% info.values.$key %]" name="[% info.name %]" value="[% info.values.$key | html %]"
+                [%~ IF info.value == info.values.$key =%]
+                    checked="checked"
+                [%~ END ~%]
+                >
+                [% key | html %]
+            </label><br>
+        [% END %]
+        </div>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </div>
+[% END;
+
+USE format;
+
+date_month_format = format("%02d");
+
+MACRO date_field(info) BLOCK;
+    IF info.no_day != 1;
+        info.day   = info.value.strftime('%d');
+    END;
+    info.month = info.month || info.value.strftime('%m');
+    info.year  = info.year  || info.value.strftime('%Y');
+
+    info.start_year = info.start_year || 1920;
+    info.end_year   = info.end_year || 2003;
+
+    info.type = 'date';
+    render_field(info);
+END;
+
+MACRO render_checkbox_group(info) BLOCK %]
+    <div class="input_group">
+        [%~ FOREACH key IN info.values.keys ~%]
+            <label class="radio-label">
+                <input [% IF info.maxlength %]maxlength="[% info.maxlength %]"[% END %] [% IF info.width %]size="[% info.width %]"[% END %] type="[% info.type || 'radio' %]" id="form_[% info.name %]_[% info.values.$key %]" name="[% info.name %]" value="[% info.values.$key | html %]"
+                [%~ IF info.value == info.values.$key =%]
+                    checked="checked"
+                [%~ END ~%]
+                >
+                [% key | html %]
+            </label><br>
+        [% END %]
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </div>
+[% END;
+
+MACRO render_date_field(info) BLOCK %]
+    <div class="input_group">
+        <select id="form_[% info.name %]" name="[% info.name %].month" class="inline">
+         [% FOREACH month_opt IN [ 0 .. 12 ] %]
+          <option value="[% month_opt %]"[% IF date_month_format(month_opt) == info.month %] selected="selected"[% END %]>[% month_opt || "Month" %]</option>
+         [% END %]
+        </select>
+[% IF info.no_day != 1 %]
+        <select name="[% info.name %].day" class="inline">
+         [% FOREACH day_opt IN [ 0 .. 31 ] %]
+          <option value="[% day_opt %]"[% IF date_month_format(day_opt) == info.day %] selected="selected"[% END %]>[% day_opt || "Day" %]</option>
+         [% END %]
+         </select>
+[% END %]
+        <select name="[% info.name %].year" class="inline">
+         <option value="0">Year</option>
+         [% FOREACH year_opt IN [ info.start_year .. info.end_year ] %]
+          <option value="[% year_opt %]"[% IF year_opt == info.year %] selected="selected"[% END %]>[% year_opt %]</option>
+         [% END %]
+        </select>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </div>
+[% END;
+
+MACRO phone_field(info) BLOCK;
+    IF info.value;
+        area_code = info.value.substr(0, 3);
+        prefix    = info.value.substr(3, 3);
+        last4     = info.value.substr(6);
+    END %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    [% IF !info.value && info.hint;
+      hinted = 1;
+    END; %]
+    <p id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        <span class="group">
+         (<input type="text" id="form_[% info.name %]" name="[% info.name %].areacode" value="[% area_code %]" size="3" class="inline">)
+         <input type="text" id="form_[% info.name %]" name="[% info.name %].prefix" value="[% prefix %]" size="3" class="inline">-
+         <input type="text" id="form_[% info.name %]" name="[% info.name %].last4" value="[% last4 %]" size="4" class="inline">
+        </span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+    </p>[%
+END;
+
+MACRO address_field(info) BLOCK %]
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional %]&nbsp;&nbsp;&nbsp;&nbsp;[% ELSE %][% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span></label>
+        <div class="group inline">
+            <p>
+                <label for="address_1">Street:</label>
+                <input type="text" name="address_1" value="[% info.values.address_1 %]">
+            </p>
+            <p>
+                <label for="city">City:</label>
+                <input type="text" name="city" value="[% info.values.city %]">
+            </p>
+            <p>
+                <label for="state">State:</label>
+                <select name="state">
+                [% FOREACH state IN c.model('Schema::State').all %]
+                    <option value="[% state.abbr %]" [% IF info.values.state == state.abbr %] selected="selected"[% END %]>[% state.full_name %]</option>
+                [% END %]
+                </select>
+            </p>
+            <p>
+                <label for="zip">Zip:</label>
+                <input type="text" name="zip" value="[% info.values.zip %]" style="width: 5em;" size="5">
+            </p>
+        </div>
+    </div>[%
+END;
+
+MACRO sort_link(key) BLOCK;
+    cur_dir = dir || 'DESC';
+    IF sort_by == key; cur_dir = cur_dir == 'DESC' ? 'ASC' : 'DESC'; END;
+    c.req.uri_with({ sort_by => key, dir => cur_dir });
+END;
+
+~%]

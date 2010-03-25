@@ -1,0 +1,75 @@
+[% is_editable = 1 %]
+<h4>[% c.loc('Ticket #[_1]', ticket.id) %]</a></h4>
+[% IF is_editable %]<form>[% END %]
+ <table class="ticket">
+  <tbody>
+   <tr>
+    [% readonly_field({ label => 'Type', value => ticket.type.name }) %]
+   </tr>
+   <tr>
+    [% readonly_field({ label => 'Queue', value => ticket.queue.name, link => c.uri_for_action('/queue/object', [ ticket.parent_pk1 ]) }) %]
+   </tr>
+   <tr>
+[% IF is_editable;
+     select_field({
+         default_option => [ 0, 'Choose...' ],
+         label => 'Owner', name => 'ticket.owner',
+         value => owner.person_pk1,
+         array => ticket.assignable_persons.all,
+         value_method => 'pk1', label_method => 'name'
+     });
+ ELSE;
+     readonly_field({ label => 'Owner', name => 'ticket.owner', value => owner.person.name });
+ END %]
+   </tr>
+   <tr>
+   [% IF is_editable;
+      select_field({
+         default_option => [ 0, '' ],
+         label => 'Attention', name => 'ticket.attention',
+         value => attention.person_pk1,
+         array => ticket.assignable_persons.all,
+         value_method => 'pk1', label_method => 'name',
+      });
+   ELSE;
+      readonly_field({ label => 'Attention', name => 'ticket.reporter', value => attention.person.name, important => 1, double => 1 });
+   END %]
+   </tr>
+   <tr>
+   [% dt = ticket.due_date; due_date = dt;
+      IF dt.defined && dt.dt_marker.defined;
+        link = c.uri_for_action('/calendar/root', dt.dt_marker.year, dt.dt_marker.month, { highlight => 'ticket', 'ticket' => ticket.id } );
+        due_date = dt.dt_marker | date_long;
+      ELSE;
+        due_date = c.loc('Unscheduled');
+      END;
+      readonly_field({ label => 'Date Due', name => 'ticket.date_due', type => 'date', value => due_date, link => link }); %]
+   </tr>
+   <tr>
+    [% IF is_editable;
+         select_field({
+             label => 'Priority', name => 'ticket.priority',
+             value => ticket.state.priority_pk1,
+             array => ticket.assignable_priorities.all,
+             value_method => 'pk1', label_method => 'name'
+         });
+     ELSE;
+         readonly_field({ label => 'Priority', name => 'ticket.priority', value => 'Normal' });
+     END %]
+   </tr>
+   <tr>
+   [% readonly_field({ label => 'Tags', double => 1, name => 'ticket.tags', value => tag_list.join(' ') }); %]
+   </tr>
+   [% IF is_editable %]
+   <tr class="submit">
+    <td colspan="4"><input type="image" src="[% static('/static/images/buttons/save-medium.png') %]" alt="c.loc('Submit Form') %]"></td>
+   </tr>
+   [% END %]
+  </tbody>
+ </table>
+</form>
+<ul>
+ <li><a href="#comment">[% c.loc('Comment') %]</a></li>
+ <li><a href="[% c.uri_for('/ticket/create', { parent => ticket.id }) %]">[% c.loc('Create Dependent') %]</a></li>
+ <li><a href="#">[% c.loc('Add to Stack') %]</a></li>
+</ul>

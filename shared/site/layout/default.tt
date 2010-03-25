@@ -1,0 +1,28 @@
+[% IF page.crumbs.size %]
+<nav id="crumbs">
+ <ul>
+  <li><a href="[% c.uri_for('/') %]">[% c.loc('Home') %]</a> [% c.loc('CRUMBS_SEP') %]</li>
+  [% FOREACH link = page.crumbs %]
+   [% IF loop.last %]
+   <li>[% c.loc(link.keys.0) %]</li>
+   [% ELSE %]
+   <li><a href="[% link.values.0 %]">[% c.loc(link.keys.0) %]</a> [% c.loc('CRUMBS_SEP') %]</li>
+   [% END %]
+  [% END %]
+ </ul>
+</nav>
+[% END %]
+<article id="content">
+ <div id="main" class="clearfix">
+ [% PROCESS site/messages.tt %]
+[%~ 
+# Nothing fancy here.  Just dump the content.
+content
+~%]
+ [% IF c.debug %]
+ <section id="debug">
+  [% PROCESS site/instrumentation/querylog.tt %]
+ </section>
+ [% END %]
+ </div>
+</article>

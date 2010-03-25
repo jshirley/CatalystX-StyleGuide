@@ -1,0 +1,72 @@
+[%~
+
+USE Number.Format;
+
+tickets_open   = 0;
+tickets_closed = 0;
+tickets_total  = 0;
+
+~%]
+<table class="summary">
+ <tbody>
+  <tr class="head">
+   <th>[% c.loc('Ticket') %]</th>
+   <th>[% c.loc('Summary') %]</th>
+   <th>[% c.loc('Status') %]</th>
+   <th>[% c.loc('Owner') %]</th>
+   <th>[% c.loc('Date Due') %]</th>
+   <th>[% c.loc('Type') %]</th>
+   <th>[% c.loc('Priority') %]</th>
+   <th>[% c.loc('Component') %]</th>
+  </tr>
+[% FOREACH ticket IN tickets;
+    classes = [];
+    
+    ticket_uri = c.uri_for_action('/ticket/object', [ ticket.id ]);
+    IF ticket.status.name == 'CLOSED';
+        classes.push('closed');
+        tickets_closed = tickets_closed + 1;
+    ELSE;
+        tickets_open = tickets_open + 1;
+    END;
+    IF ticket.needs_attention;
+        classes.push('imp');
+    END;
+    IF loop.index % 2 == 0;
+        classes.push('odd');
+    END;
+
+    tickets_total  = tickets_total + 1;
+
+~%]
+  <tr class="[% classes.join(' ') %]">
+   <th class="link"><a href="[% ticket_uri %]">[% ticket.id %]</a></th>
+   <td class="link"><a href="[% ticket_uri %]">[% ticket.name | html %]</a></td>
+   <td>[% c.loc(ticket.status.name) %]</td>
+   <td>[% ticket.owner.person.token | html %]</td>
+   <td>[% due_date = ticket.due_date; IF due_date; %]<time datetime="[% due_date.dt_marker %]">[% pretty_date(due_date.dt_marker); %]</time>[% ELSE; "&mdash;"; END %]</td>
+   <td>[% c.loc(ticket.type.name) %]</td>
+   <td>[% c.loc(ticket.priority.name) %]</td>
+   <td>X</td>
+  </tr>
+[% END %]
+ </tbody>
+[% IF tickets_total %]
+ <tfoot>
+   <tr>
+    [%= SET complete_percent = ( tickets_closed / tickets_total ) * 100 ~%]
+    <td colspan="8">
+     <meter>
+      [% IF complete_percent == 100 %]
+      <img src="/static/images/actions/tick.png">
+      [% ELSE %]
+      <img src="[% c.uri_for('/chart/completion_pie', complete_percent) %]">
+      [% END %]
+      [% complete_percent | format_number %]% Complete
+     </meter>[%~ =%]
+     <details><a href="#">[% c.loc('[_1] Closed', [ tickets_closed ]) %]</a> + <a href="#">[% c.loc('[_1] Open', [ tickets_open ] ) %]</a> = <a href="#">[% c.loc('[_1] Total', [ tickets_total ] ) %]</a></details>
+    </td>
+   </tr>
+ </tfoot>
+[% END %]
+</table>

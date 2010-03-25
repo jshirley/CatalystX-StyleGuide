@@ -1,0 +1,6 @@
+<h4>[% c.loc('Ticket Stack') %]</h4>
+<ul class="tix">
+ <li><a href="#">#1234 Test Suite Generated Ticket</a></li>
+ <li><a href="#">#1235 Lorem Ipsum Solor Amet Long Ass Ticket Name</a></li>
+</ul>
+

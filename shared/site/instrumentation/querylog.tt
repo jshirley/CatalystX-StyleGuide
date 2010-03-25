@@ -1,0 +1,39 @@
+[% IF querylog %]
+ [% SET total = querylog.time_elapsed | format('%0.6f') %]
+ <h3>[% c.loc('Query Log Report') %]</h3>
+ <table>
+  <tbody>
+   <tr class="head">
+    <th>Time</th>
+    <th>%</th>
+    <th>SQL</th>
+   </tr>
+   [% FOREACH q = qlanalyzer.get_sorted_queries %]
+   <tr class="[% IF loop.count % 2 %]odd[% END %]">
+    <th>[% q.time_elapsed | format('%0.6f') %]</th>
+    <td>[% ((q.time_elapsed / total ) * 100 ) | format('%i') %]%</td>
+    <td>[% q.sql %]: [% q.params.join(',') %]</td>
+   </tr>
+   [% END %]
+  </tbody>
+  <tfoot>
+   <tr>
+    <td colspan="4">
+     <details>
+     <dl>
+      <dt>Total SQL Time:</dt>
+      <dd>[% total | format('%0.6f') %] seconds<dd>
+      [% SET qcount = querylog.count %]
+      <dt>Total Queries:</dt>
+      <dd>[% qcount %]</dd>
+      [% IF qcount > 0 %]
+      <dt>Avg Statement Time:</dd>
+      <dd>[% (querylog.time_elapsed / qcount) | format('%0.6f') %] seconds.</dd>
+      [% END %]
+      </dl>
+     </details>
+    </td>
+   </tr>
+  </tfoot>
+ </table>
+[% END %]

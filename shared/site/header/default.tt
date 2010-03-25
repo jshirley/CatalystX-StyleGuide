@@ -1,0 +1,8 @@
+<div class="header">
+    <h1>header</h1>
+    [% # Include the navigation
+    IF page.nav && page.nav != 'none';
+        PROCESS "site/nav/${page.nav}.tt";
+    END;
+    ~%]
+</div>

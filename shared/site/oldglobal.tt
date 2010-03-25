@@ -1,0 +1,277 @@
+[%~
+
+MACRO logo BLOCK;
+    SET lang = 'en';
+    # Just list languages we support?  Not sure...
+    IF c.language == 'ja';
+        lang = c.language;
+    END;
+    c.static_uri("images/logo-${lang}.png");
+END;
+
+MACRO select_field(info) BLOCK; %]
+    [%~ IF info.dynamic_array =%]<script type="text/javascript">if ( typeof dynamic_forms === 'undefined' ) dynamic_forms = {}; dynamic_forms['[% info.value_from %]'] = { 'source': '[% info.dynamic_array %]', 'update': '[% info.name %]', 'value': "[% info.value || html %]" };</script>[% IF info.array.size == 0; info.array.push(c.loc('Please select [_1]', [ info.value_from ] ) ); END; END %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %] [% IF info.class %][% info.class %][% END %]">
+     <label for="form_[% info.name %]">[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+     <select id="form_[% info.name %]" name="[% info.name %]" style="width: auto" class="
+      [%~ IF info.dynamic_array =%]
+        dynamic-array
+      [%~ END ~%]">
+      [% IF info.default_option %]<option value="[% info.default_option.0 %]">[% info.default_option.1 %]</option>[% END %]
+      [% FOREACH item = info.array;
+            IF info.value_method;
+                SET this_value = item.${info.value_method}; 
+            ELSE;
+                SET this_value = item;
+            END;
+            IF info.label_method;
+                SET this_name = item.${info.label_method};
+            ELSE;
+                SET this_name = item;
+            END;
+        %]<option value="[% this_value %]" [% IF this_value == info.value %]selected="selected"[% END %] >[% this_name %]</option>
+      [% END %]
+     </select>
+     <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+     [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO autocomplete_field(info) BLOCK;
+    info.autocomplete = 1;
+    text_field(info);
+END;
+
+MACRO country_field(info) BLOCK; %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+     <label for="form_[% info.name %]">[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+     <select id="form_[% info.name %]" name="[% info.name %]">
+     [% PROCESS form/countries.tt %]
+     </select>
+     <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+     [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO password_field(info) BLOCK; 
+    info.type = 'password'; 
+    text_field(info); 
+END;
+
+MACRO text_field(info) BLOCK %]
+    [% IF !info.value && info.hint;
+      hinted = 1;
+    END; 
+    classes = [ 'text_group' ];
+    classes.push( info.classes );
+    IF info.optional; classes.push('optional'); END;
+    %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) ~%]
+            [%~ IF info.tooltip %]<script type="text/javascript">new YAHOO.widget.Tooltip('tt_[% info.name %]_label', { context: 'form_[% info.name %]_label', text: "[% info.tooltip | replace('"', '\"') %]" } );</script>[?][% END ~%]
+            [% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %][% END %]</span>[%~ ~%]
+        </label>
+        <input type="[% info.type || 'text' %]" id="form_[% info.name %]" name="[% info.name %]" value="[% info.value || info.hint | html %]"
+            [%~ IF info.autocomplete == 0 %] autocomplete="false"[% END ~%]
+            [%~ IF info.disabled     == 1 %] disabled="disabled"[% END ~%]
+            [%~ IF info.tabindex %] tabindex="[% info.tabindex %]"[% END ~%]
+            [%~ IF info.maxlength %] maxlength="[% info.maxlength %]"[% END ~%]
+            [%~ IF info.width %] size="[% info.width %]" style="width: [% info.width %]em;"[% END ~%]
+            class="
+            [%~ IF hinted                 %] hintable[% END ~%]
+            [%~ IF info.focus        == 1 %] focus[% END ~%]
+            [%~ IF info.autocomplete == 1 %] autocomplete[% END ~%]
+            "
+        />
+        [%~ IF info.autocomplete == 1 %]<div id="ac_[% info.name %]_container"></div>[% END =%]
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO textarea_field(info) BLOCK; %]
+    <div class="text_group[% IF info.optional %] optional[% END %] [% IF info.class %][% info.class %][% END %]">
+        <label for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <textarea [%= ~%]
+            id="form_[% info.name %]" name="[% info.name %]"
+            class="
+            [%~ IF info.class %][% info.class %][% END ~%]
+            [%~ IF info.focus %] focus[% END ~%]
+            "
+            [%~ IF info.rows %] rows="[% info.rows %]"[% END ~%]
+            [%~ IF info.cols %] cols="[% info.cols %]" style="width: [% info.cols %]em"[% END ~%]
+        >
+            [%~ info.value | html ~%]
+        </textarea>
+        [% IF info.extra; "<p>&nbsp;"; info.extra; "</p>"; END %]
+        [% IF info.message %]<p class="attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO readonly_field(info) BLOCK %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <input type="hidden" id="form_[% info.name %]" name="[% info.name %]" value="[% info.value | html %]"/>
+        <span class="readonly">[% info.value %]</span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO display_field(info) BLOCK %]
+    [% IF info.optional != 0; info.optional = 1; END; %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <span class="readonly" id="form_[% info.name %]">[% info.value %]</span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+
+MACRO checkbox_field(info) BLOCK %]
+    <div id="form_[% info.name %]_fields" class="checkbox text_group[% IF info.optional %] optional[% END %]">
+        <label for="form_[% info.name %]_[% info.value %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %]<span class="required">[% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <input [% IF info.maxlength %]maxlength="[% info.maxlength %]"[% END %] [% IF info.width %]size="[% info.width %]"[% END %] type="[% info.type || 'checkbox' %]" id="form_[% info.name %]_[% info.value %]" name="[% info.name %]" value="[% info.value | html %]"
+            [%~ IF info.checked      == 1 %] checked="checked"[% END ~%]
+            [%~ IF info.disabled     == 1 %] disabled="disabled"[% END ~%]
+        />
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO radio_group(info) BLOCK; 
+    classes = [ 'label' ];
+    IF info.message; classes.push('attention'); END; %]
+    <div id="form_[% info.name %]_fields" class="input_group[% IF info.optional %] optional[% END %]">
+        <div class="[% classes.join(' ') %]">[%= ~%]
+            [% c.loc(info.label) ~%]
+            [% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %][% END %]
+        </div>
+        [%~ FOREACH key IN info.values.keys ~%]
+            <input [% IF info.maxlength %]maxlength="[% info.maxlength %]"[% END %] [% IF info.width %]size="[% info.width %]"[% END %] type="[% info.type || 'radio' %]" id="form_[% info.name %]_[% info.values.$key %]" name="[% info.name %]" value="[% info.values.$key | html %]"
+                [%~ IF info.value == info.values.$key =%]
+                    checked="checked"
+                [%~ END ~%]
+            />
+            <label for="form_[% info.name %]_[% info.values.$key %]">[% key | html %]</label>
+        [% END %]
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>
+[% END;
+
+USE format;
+
+date_month_format = format("%02d");
+
+MACRO date_field(info) BLOCK;
+    IF !info.value; info.value = now; END;
+    IF info.no_day != 1;
+        day   = info.value.strftime('%d');
+    END;
+    month = info.month || info.value.strftime('%m');
+    year  = info.year || info.value.strftime('%Y');
+    start_year = info.start_year || 1920;
+    end_year   = info.end_year || 2003;
+%]
+    [% IF !info.value && info.hint;
+      hinted = 1;
+    END; %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <select id="form_[% info.name %]" name="[% info.name %].month" class="inline">
+         [% FOREACH month_opt IN [ 0 .. 12 ] %]
+          <option value="[% month_opt %]"[% IF date_month_format(month_opt) == month %] selected="selected"[% END %]>[% month_opt || "MM" %]</option>
+         [% END %]
+        </select>
+[% IF info.no_day != 1 %]
+        <select name="[% info.name %].day" class="inline">
+         [% FOREACH day_opt IN [ 0 .. 31 ] %]
+          <option value="[% day_opt %]"[% IF date_month_format(day_opt) == day %] selected="selected"[% END %]>[% day_opt || "DD" %]</option>
+         [% END %]
+         </select>
+[% END %]
+        <select name="[% info.name %].year" class="inline">
+         <option value="0">[% c.loc('Year') %]</option>
+         [% FOREACH year_opt IN [ start_year .. end_year ] %]
+          <option value="[% year_opt %]"[% IF year_opt == year %] selected="selected"[% END %]>[% year_opt %]</option>
+         [% END %]
+        </select>
+        <a class="extra calendar-popup" name="cal_[% info.name %]" href="#[% info.name %]"><img src="[% static('images/calendar.png') %]" title="[% c.loc('Open Calendar') %]" alt="[% c.loc('Open Calendar') %]"></a>
+        <div id="cal_[% info.name %]" class="calendar"></div>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>
+[% END;
+
+MACRO phone_field(info) BLOCK;
+    IF info.value;
+        area_code = info.value.substr(0, 3);
+        prefix    = info.value.substr(3, 3);
+        last4     = info.value.substr(6);
+    END %]
+    [% IF !info.value && info.hint;
+      hinted = 1;
+    END; %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <span class="group">
+         (<input type="text" id="form_[% info.name %]" name="[% info.name %].areacode" value="[% area_code %]" size="3" class="inline">)
+         <input type="text" id="form_[% info.name %]" name="[% info.name %].prefix" value="[% prefix %]" size="3" class="inline">-
+         <input type="text" id="form_[% info.name %]" name="[% info.name %].last4" value="[% last4 %]" size="4" class="inline">
+        </span>
+        <span id="form_[% info.name %]_extra" class="extra">[% info.extra %]</span>
+        [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO address_field(info) BLOCK %]
+    <div id="form_[% info.name %]_fields" class="text_group[% IF info.optional %] optional[% END %]">
+        <label id="form_[% info.name %]_label" for="form_[% info.name %]"[% IF info.message %] class="attention"[%  END %]>[% c.loc(info.label) %][% IF info.optional && !form.hide_optional %]<span class="optional">[% c.loc("FIELD OPTIONAL SPLAT") %][% ELSIF !info.optional && !form.hide_required %]<span class="required">[% c.loc("FIELD REQUIRED SPLAT") %]</span>[% END %]</label>
+        <div class="group inline">
+            <p>
+                <label for="address_1">Street:</label>
+                <input type="text" name="address_1" value="[% info.values.address_1 %]">
+            </p>
+            <p>
+                <label for="city">City:</label>
+                <input type="text" name="city" value="[% info.values.city %]">
+            </p>
+            <p>
+                <label for="state">State:</label>
+                <select name="state">
+                [% FOREACH state IN c.model('Schema::State').all %]
+                    <option value="[% state.abbr %]" [% IF info.values.state == state.abbr %] selected="selected"[% END %]>[% state.full_name %]</option>
+                [% END %]
+                </select>
+            </p>
+            <p>
+                <label for="zip">Zip:</label>
+                <input type="text" name="zip" value="[% info.values.zip %]" style="width: 5em;" size="5">
+            </p>
+        </div>
+    [% IF info.message %]<p class="clear attention">[% c.loc(info.message) %]</p>[% END %]
+    </div>[%
+END;
+
+MACRO sort_link(key) BLOCK;
+    cur_dir = dir || 'DESC';
+    IF sort_by == key; cur_dir = cur_dir == 'DESC' ? 'ASC' : 'DESC'; END;
+    c.req.uri_with({ sort_by => key, dir => cur_dir });
+END;
+
+MACRO run_widget(name, args) BLOCK;
+    SET widge = widget.load(name, args);
+    WRAPPER "widgets/wrapper.tt";
+        INCLUDE "widgets/${widge.template}" args = widge.run(args);
+    END;
+    page.widgets.push(name);
+END;
+
+MACRO show_ad(category, name) BLOCK;
+    PROCESS "ads/${category}/${name}.tt";
+END;
+
+~%]

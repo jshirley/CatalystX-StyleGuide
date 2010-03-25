@@ -1,0 +1,8 @@
+<form method="post" action="[% c.uri_for_action('/switch') %]">
+    <select name="design">
+    [% FOREACH d IN designs.keys %]
+        <option value="[% design | html %]"[% IF d == design %] selected="selected"[% END %]>[% design %]</option>
+    [% END %]
+    </select>
+    <input type="submit" value="Set Design">
+</form>

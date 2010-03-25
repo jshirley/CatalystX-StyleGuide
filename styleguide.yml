@@ -1,0 +1,13 @@
+---
+name: StyleGuide
+default_view: StyleGuide
+View::StyleGuide:
+    shared_root: __path_to(shared)__
+    designs:
+        NasaEms:
+            root: __path_to(designs/ems/root)__
+            static: __path_to(designs/ems/static)__
+        Plain:
+            root: __path_to(designs/plain/root)__
+            static: __path_to(designs/plain/static)__
+

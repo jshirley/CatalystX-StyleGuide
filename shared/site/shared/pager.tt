@@ -1,0 +1,24 @@
+<nav class="pager">
+ <p>[% c.loc('Results [_1] to [_2] of [_3], Page [_4] of [_5]', pager.first, pager.last, pager.total_entries, pager.current_page, pager.last_page) %]</p>
+ <ol>
+  <li class="first"><a href="[% c.req.uri_with({ page => pager.first_page }) %]"><img src="/static/images/actions/resultset_first.png"></a></li>
+  [% IF pager.current_page > pager.first_page %]
+  <li class="first"><a href="[% c.req.uri_with({ page => pager.previous_page }) %]">[% c.loc('Previous') %]</a></li>
+  [% ELSE %]
+  <li class="first">[% c.loc('Previous') %]</li>
+  [% END %]
+  [% FOREACH [ pager.first_page .. pager.last_page ] %]
+    [% IF loop.count == pager.current_page %]
+    <li>[% loop.count %]</li>
+    [% ELSE %]
+    <li><a href="[% c.req.uri_with({ page => loop.count }) %]">[% loop.count %]</a></li>
+    [% END %]
+  [% END %]
+  [% IF pager.current_page < pager.last_page %]
+  <li class="last"><a href="[% c.req.uri_with({ page => pager.next_page }) %]">[% c.loc('Next') %]</a></li>
+  [% ELSE %]
+  <li class="last">[% c.loc('Next') %]</li>
+  [% END %]
+  <li class="last"><a href="[% c.req.uri_with({ page => pager.last_page }) %]"><img src="/static/images/actions/resultset_last.png"></a></li>
+ </ol>
+</nav>

@@ -1,0 +1,5 @@
+[% IF 1 %]
+<aside id="notice">
+ <p><a href="http://eepurl.com/j0P6"><img src="/static/images/ads/cp-news.png"></a></p>
+</aside>
+[% END %]

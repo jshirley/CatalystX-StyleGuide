@@ -1,0 +1,9 @@
+<nav>
+ <ul>
+  [% IF c.user_exists %]
+  <li><a href="[% c.uri_for_action('/my/root') %]">[% c.loc('Projects') %]</a></a></li>
+  <li><a href="[% c.uri_for_action('/my/info') %]">[% c.loc('Information') %]</a></a></li>
+  [% END %]
+  <li><a href="[% c.uri_for_action('/paste/root') %]">[% c.loc('New Paste') %]</a></li>
+ </ul>
+</nav>

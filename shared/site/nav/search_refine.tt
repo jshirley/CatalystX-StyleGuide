@@ -1,0 +1,58 @@
+<h3>[% c.loc('Refine') %]</h3>
+<ul>
+[% SET products = results.facets.products %]
+[% IF products.size > 1 %]
+ [% SET s_things = results.get_sorted_facet('product') %]
+ <li>[% c.loc('Product') %]
+   <ul>
+   [% FOREACH prod = s_things %]
+    <li><a href="[% c.req.uri_with({ product => prod }) %]">[% c.loc('[_1] ([_2])', prod, products.${prod}) %]</a></li>
+   [% END %]
+   </ul>
+ </li>
+[% END %]
+[% SET statuses = results.facets.status %]
+[% IF statuses.size > 1 %]
+ [% SET s_things = results.get_sorted_facet('status') %]
+ <li>[% c.loc('Status') %]
+   <ul>
+   [% FOREACH status = s_things %]
+    <li><a href="[% c.req.uri_with({ 'status' => status }) %]">[% c.loc('[_1] ([_2])', c.loc(status), statuses.${status}) %]</a></li>
+   [% END %]
+   </ul>
+ </li>
+[% END %]
+[% SET owners = results.facets.owner %]
+[% IF owners.size > 1 %]
+ [% SET s_things = results.get_sorted_facet('owner') %]
+ <li>[% c.loc('Owner') %]
+   <ul>
+   [% FOREACH owner = s_things %]
+    <li><a href="[% c.req.uri_with({ 'owner' => owner }) %]">[% c.loc('[_1] ([_2])', owner, owners.${owner}) %]</a></li>
+   [% END %]
+   </ul>
+ </li>
+[% END %]
+[% SET priorities = results.facets.priority %]
+[% IF priorities.size > 1 %]
+ [% SET s_things = results.get_sorted_facet('priority') %]
+ <li>[% c.loc('Priority') %]
+   <ul>
+   [% FOREACH pri = s_things %]
+    <li><a href="[% c.req.uri_with({ 'priority' => pri }) %]">[% c.loc('[_1] ([_2])', pri, priorities.${pri}) %]</a></li>
+   [% END %]
+   </ul>
+ </li>
+[% END %]
+[% SET types = results.facets.type %]
+[% IF types.size > 1 %]
+ [% SET s_things = results.get_sorted_facet('type') %]
+ <li>[% c.loc('Type') %]
+   <ul>
+   [% FOREACH type = s_things %]
+    <li><a href="[% c.req.uri_with({ 'type' => type }) %]">[% c.loc('[_1] ([_2])', type, types.${type}) %]</a></li>
+   [% END %]
+   </ul>
+ </li>
+[% END %]
+</ul>
