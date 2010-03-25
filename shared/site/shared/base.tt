@@ -24,8 +24,8 @@ END;
 IF !page || !ref(page) == 'HASH';
     page = {};
 END;
-DEFAULT page.title  = '';
-DEFAULT page.description = 'An enlightened pastebin for standalone or project use.';
+DEFAULT page.title       = design || c.config.name;
+DEFAULT page.description = 'StyleGuide Default Description';
 DEFAULT page.layout = 'default';
 DEFAULT page.header = 'default';
 DEFAULT page.nav    = 'default';
@@ -45,6 +45,10 @@ DEFAULT page.crumbs           = [];
 DEFAULT page.content_class    = 'content';
 
 # Include global macros/vars/set up per implementation
-TRY; PROCESS site/global.tt; CATCH file; END;
+TRY;
+    PROCESS site/global.tt;
+CATCH file;
+    IF c.debug; file; END;
+END;
 
 ~%]

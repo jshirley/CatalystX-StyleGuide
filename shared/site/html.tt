@@ -15,9 +15,8 @@ END;
 <html lang="[% page.language %]">
  <head>
   <meta charset="utf-8">
-  <title>Codepeek[% IF page.title %]: [% page.title %] [% ELSE %], the Enlightened Pastebin[% END %]</title>
+  <title>[% IF page.title %]</title>
   <meta http-equiv="Content-Language" content="[% page.language %]">
-  <meta name="google-site-verification" content="xkULRZIWgERjfbepNJTesWRHke3-mMBxPRCax8AUEkw" />
   <meta name="description" content="[% page.description %]">
 [%
 # Add all javascript refs in page.head.scripts (see page.body.scripts)
@@ -61,6 +60,5 @@ END;
     [%
     END;
     %]
- [% PROCESS site/instrumentation/googleanalytics.tt %]
  </body>
 </html>
