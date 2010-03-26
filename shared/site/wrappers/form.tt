@@ -1,0 +1,9 @@
+[% IF section.scope %]
+<input type="hidden" name="scopes" value="[% section.scope %]">
+[% END %]
+<fieldset>
+    <a name="scope_[% section.scope %]"></a>
+    <legend>[% section.title %]</legend>
+    [% content %]
+</fieldset>
+

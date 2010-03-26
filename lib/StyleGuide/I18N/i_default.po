@@ -1,0 +1,2 @@
+msgid "FIELD REQUIRED SPLAT"
+msgstr "&#10036;"

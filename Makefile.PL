@@ -10,10 +10,13 @@ requires 'Catalyst::Runtime' => '5.80021';
 requires 'Catalyst::Plugin::ConfigLoader';
 requires 'Catalyst::Plugin::Static::Simple';
 requires 'Catalyst::Action::RenderView';
+
+requires 'Catalyst::View::TT';
+
 requires 'Moose';
 requires 'namespace::autoclean';
-requires 'Config::General'; # This should reflect the config file format you've chosen
-                 # See Catalyst::Plugin::ConfigLoader for supported formats
+requires 'YAML::Syck';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 

@@ -1,0 +1,200 @@
+[%~
+
+page.title = 'Default StyleGuide';
+
+~%]
+<h1>[% design %] does not implement a guide.tt template!</h1>
+
+<h2>Global Messaging</h2>
+<div class="message">
+ <div class="gmessage"><p>I'm a positive message.</p></div>
+ <div class="rmessage"><p>I'm an error message.</p></div>
+ <div class="omessage"><p>I'm a warning message.</p></div>
+</div>
+<h2>Headings</h2>
+<h1>Heading 1</h1>
+<h2>Heading 2</h2>
+<h3>Heading 3</h3>
+<h4>Heading 4</h4>
+<h3>Paragraphs</h3>
+<p>Normal paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p class="subdued">Subdued paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p class="error">Error paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p class="important">Important paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p class="success">Success paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p class="caption">Caption paragraph: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p><small>Paragraph + Small: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</small></p>
+<p>This is a <a href="#">link</a>.</p>
+<h3>Lists</h3>
+<p>What follows is an unordered list!</p>
+<ul>
+ <li>List item.</li>
+ <li>List item.</li>
+ <li>List item.</li>
+ <li>List item.</li>
+</ul>
+<p>What follows is an ordered list!</p>
+<ol>
+ <li>List item.</li>
+ <li>List item.</li>
+ <li>List item.</li>
+ <li>List item.</li>
+</ol>
+<dl>
+ <dt>This is a definition term in a list.</dt>
+ <dd>This is a definition definition in a list.</dd>
+ <dt>This is a definition term in a list.</dt>
+ <dd>This is a definition definition in a list.</dd>
+ <dt>This is a definition term in a list.</dt>
+ <dd>This is a definition definition in a list.</dd>
+</dl>
+<h3>High Level Controls</h3>
+<form>
+ <input type="search" placeholder="Search!">
+ <input type="submit" value="Go">
+</form>
+<div class="pager">
+ <p>Page 1 of 5</p>
+ <ol>
+  <li class="first"><a href="#"><img src="/static/images/actions/resultset_first.png"></a></li>
+  <li class="first">Previous</li>
+  <li>1</li>
+  <li><a href="#">2</a></li>
+  <li><a href="#">3</a></li>
+  <li><a href="#">4</a></li>
+  <li><a href="#">5</a></li>
+  <li class="last"><a href="#">Next</a></li>
+  <li class="last"><a href="#"><img src="/static/images/actions/resultset_last.png"></a></li>
+ </ol>
+</div>
+<br>
+<h3>Various and Sundry Bits</h3>
+<div class="article">
+ <h4>A Thing</h4>
+ <div class="section">XX
+  <dt>A Thing's Details</dt>
+  <dl>
+   <dt>Name:</dt><dd>A Thing</dd>
+   <dt>Size:</dt><dd>1234 bytes</dd>
+   <dt>Rank:</dt><dd>Leftenant</dd>
+   <dt>Serial #:</dt><dd>1897712-010182</dd>
+  </dl>
+ </div>
+</div>
+<blockquote>
+ <p>XX This is a block quote.  It's a big ass box full of text that is quoted.  Neat!</p>
+</blockquote>
+<table>
+ <thead>
+  <tr>
+   <th colspan="3">Table Header</th>
+  <tr>
+ </thead>
+ <tfoot>
+   <tr>
+    <td colspan="3">Table Footer</td>
+   </tr>
+ </tfoot>
+ <tbody>
+  <tr class="head">
+   <th>Column Head</th>
+   <th>Column Head</th>
+   <th>Column Head</th>
+  </tr>
+  <tr>
+   <th>Row Head</th>
+   <td>Row 1A</td>
+   <td>Row 1B</td>
+  </tr>
+  <tr class="odd">
+   <th>Row Head</th>
+   <td>Row 2A</td>
+   <td>Row 2B</td>
+  </tr>
+  <tr>
+   <th>Row Head</th>
+   <td>Row 3A</td>
+   <td>Row 3B</td>
+  </tr>
+ </tbody>
+</table>
+<h3>Forms</h3>
+[%
+form({
+    title    => c.loc('Example Form'),
+    sections => [
+        'form_guide.tt',
+    ]
+}) %]
+<table class="cal">
+ <thead>
+  <tr>
+   <th colspan="7">
+    <a href="#"><img src="/static/images/actions/resultset_first.png"></a>
+    February
+    <a href="#"><img src="/static/images/actions/resultset_last.png"></a>
+   </th>
+  </tr>
+  <tr>
+   <td>Sunday</td>
+   <td>Monday</td>
+   <td>Tuesday</td>
+   <td>Wednesday</td>
+   <td>Thursday</td>
+   <td>Friday</td>
+   <td>Saturday</td>
+  </tr>
+ </thead>
+ <tbody>
+  <tr>
+   <td class="other"><a href="#">31</a></td>
+   <td><a href="#">1</a></td>
+   <td><a href="#">2</a></td>
+   <td><a href="#">3</a></td>
+   <td><a href="#">4</a></td>
+   <td><a href="#">5</a></td>
+   <td><a href="#">6</a></td>
+  </tr>
+  <tr>
+   <td><a href="#">7</a></td>
+   <td><a href="#">8</a></td>
+   <td><a href="#">9</a></td>
+   <td><a href="#">10</a></td>
+   <td><a href="#">11</a></td>
+   <td><a href="#">12</a></td>
+   <td><a href="#">13</a></td>
+  </tr>
+  <tr>
+   <td><a href="#">14</a></td>
+   <td><a href="#">15</a></td>
+   <td><a href="#">16</a></td>
+   <td>
+    <a href="#">17</a>
+    <ul>
+     <li><a href="#">Foo Bar Baz</a></li>
+    </ul>
+   </td>
+   <td><a href="#">18</a></td>
+   <td><a href="#">19</a></td>
+   <td><a href="#">20</a></td>
+  </tr>
+  <tr>
+   <td><a href="#">21</a></td>
+   <td><a href="#">22</a></td>
+   <td><a href="#">23</a></td>
+   <td><a href="#">24</a></td>
+   <td><a href="#">25</a></td>
+   <td><a href="#">26</a></td>
+   <td><a href="#">27</a></td>
+  </tr>
+  <tr>
+   <td><a href="#">28</a></td>
+   <td class="other"><a href="#">1</a></td>
+   <td class="other"><a href="#">2</a></td>
+   <td class="other"><a href="#">3</a></td>
+   <td class="other"><a href="#">4</a></td>
+   <td class="other"><a href="#">5</a></td>
+   <td class="other"><a href="#">6</a></td>
+  </tr>
+ </tbody>
+</table>

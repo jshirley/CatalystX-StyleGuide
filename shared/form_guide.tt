@@ -1,0 +1,45 @@
+[%~
+
+DEFAULT section.action = '#';
+DEFAULT section.title  = 'Example Form';
+DEFAULT section.scope  = 'example';
+
+text_field({
+        label => 'First Name', name => 'first_name',
+        value => form.first_name.value || profile.first_name
+        message  => form.first_name.message,
+    });
+text_field({
+        label => 'Last Name', name => 'last_name',
+        value => form.last_name.value || profile.last_name
+        message  => form.last_name.message,
+    });
+date_field({
+        label   => 'Date Of Birth',
+        name    => 'dob',
+        value   => form.dob.value || profile.dob,
+        message => form.dob.message
+    });
+render_field({
+        type    => 'radio',
+        label   => 'Gender',
+        name    => 'gender', optional => 1,
+        value   => form.gender.value || profile.gender,
+        message => form.gender.message,
+        values => {
+            'Male'   => 'M',
+            'Female' => 'F',
+        }
+    });
+select_field({
+        label => 'You are',
+        name => 'happiness',
+        value_method = 'id', label_method => 'name',
+        array => [
+            { id => 0, name => 'Fantastically Well' },
+            { id => 1, name => 'Certainly not fine by far' },
+            { id => 2, name => 'Close to spectacular' },
+            { id => 3, name => 'Meeting fine in a minute' },
+        ]
+    });
+%]
