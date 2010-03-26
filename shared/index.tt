@@ -1,0 +1,8 @@
+[%~
+
+page.title = 'StyleGuide Application';
+~%]
+<ul>
+    <li><a href="[% c.uri_for_action('/guide') %]">Full Guide</a></li>
+    <li><a href="[% c.uri_for_action('/switch') %]">Design Switcher</a></li>
+</ul>

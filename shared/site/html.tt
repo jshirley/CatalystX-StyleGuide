@@ -15,7 +15,7 @@ END;
 <html lang="[% page.language %]">
  <head>
   <meta charset="utf-8">
-  <title>[% IF page.title %]</title>
+  <title>[% page.title %]</title>
   <meta http-equiv="Content-Language" content="[% page.language %]">
   <meta name="description" content="[% page.description %]">
 [%
@@ -38,16 +38,15 @@ FOREACH stylesheet IN page.head.stylesheets;
                     stylesheet :
                     static("css/$stylesheet", 1); -%]
    <link rel="stylesheet" href="[% stylesheet %]" type="text/css" media="screen">
-[%
-END;
-%]
+[% END %]
     <link rel="stylesheet" href="[% static( 'css/screen.css', 1 ) %]" type="text/css" media="screen">
     <style type="text/css" id="styleoverrides"></style>
  </head>
-    [% # Drop in the header if appropriate
-    header %]
-    [% content %]
-    [% footer;
+[%
+# Drop in the header if appropriate
+    header;
+    content;
+    footer;
 
     # Add footer scripts
     page.body.scripts = page.body.scripts.unique;
@@ -55,10 +54,8 @@ END;
         NEXT UNLESS script;
         script = script.match('^(https?://|/)') ?
                         script :
-                        static('scripts/' _ script, undef, 1); -%]
+                        static("scripts/$script", undef, 1); -%]
         <script type="text/javascript" src="[% script %]"></script>
-    [%
-    END;
-    %]
+    [% END %]
  </body>
 </html>

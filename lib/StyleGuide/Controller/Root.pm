@@ -26,7 +26,7 @@ The root page (/)
 
 =cut
 
-sub guide : Chained('/') PathPart('') CaptureArgs(0) {
+sub setup : Chained('/') PathPart('') CaptureArgs(0) {
     my ( $self, $c ) = @_;
     my $design = $c->req->cookie('design');
     if ( not $design ) {
@@ -36,7 +36,11 @@ sub guide : Chained('/') PathPart('') CaptureArgs(0) {
     }
 }
 
-sub index : Chained('guide') PathPart('') Args(0) { }
+sub index : Chained('setup') PathPart('') Args(0) { 
+    my ( $self, $c ) = @_;
+}
+
+sub guide : Chained('setup') Args(0) { }
 
 sub switch : Chained('guide') Args(0) {
     my ( $self, $c ) = @_;
