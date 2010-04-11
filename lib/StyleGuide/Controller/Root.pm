@@ -43,16 +43,18 @@ sub index : Chained('setup') PathPart('') Args(0) {
 sub guide : Chained('setup') Args {
     my ( $self, $c, $layout ) = @_;
 
-    if ( $c->path_to("root/guide", "$layout.tt") ) {
-        $c->stash->{template} = "guide/$layout.tt";
+    if ( $layout ) {
+        if ( -f $c->path_to("root/guide", "$layout.tt") ) {
+            $c->stash->{template} = "guide/$layout.tt";
+        }
     }
 }
 
-sub switch : Chained('guide') Args(0) {
+sub switch : Chained('setup') Args(0) {
     my ( $self, $c ) = @_;
 
     $c->stash->{designs} = $c->view('StyleGuide')->designs;
-
+    $c->log->_dump($c->stash->{designs}) if $c->debug;
     if ( $c->req->method eq 'POST' and my $design = $c->req->params->{design} ) {
         if ( $c->view('StyleGuide')->get_design($design) ) {
             $c->res->cookies->{design} = { value => $design };
