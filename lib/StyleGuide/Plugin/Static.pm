@@ -1,8 +1,8 @@
 package StyleGuide::Plugin::Static;
 
-use Moose;
+use Moose::Role;
 
-extends 'Catalyst::Plugin::Static::Simple';
+with 'Catalyst::Plugin::Static::Simple' => { -excludes => [ '_locate_static_file' ] };
 
 # Search through all included directories for the static file
 # Based on Template Toolkit INCLUDE_PATH code
