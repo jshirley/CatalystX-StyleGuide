@@ -1,1 +1,50 @@
-designs/ems/site/footer/default.tt
+<div class="footer">
+ <div class="links">
+    <div class="alpha column">
+        <ul>
+            <li class="title"><h4>About NASA</h4></li>
+            <li><a href="#">About NASA</a></li>
+            <li><a href="#">News</a></li>
+            <li><a href="#">Photos &amp; Videos</a></li>
+            <li><a href="#">Our Members</a></li>
+            <li><a href="#">Member Benefits</a></li>
+            <li><a href="#">Regions</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Help!</a></li>
+        </ul>
+    </div>
+    <div class="column">
+        <ul>
+            <li class="title"><h4>Racing with us</h4></li>
+            <li><a href="#">HPDE/Open Track</a></li>
+            <li><a href="http://www.nasa-tt.com/">Time Trial</a></li>
+            <li><a href="#">Competition Racing</a></li>
+            <li><a href="http://www.nasarallysport.com/">Rally Sport</a></li>
+            <li><a href="http://www.nasasimracing.com">NASA SimRacing</a></li>
+        </ul>
+    </div>
+    <div class="column">
+        <ul>
+            <li class="title"><h4>NASA Marketplace</h4></li>
+            <li><a href="http://www.gogogear.com/gogo_nasa.html" target="_blank">NASA Merchandise</a></li>
+            <li><a href="http://nasa.racingjunk.com" target="_blank">Classifieds</a></li>
+        </ul>
+     </div>
+    <div class="column omega">
+        <ul>
+            <li class="title"><h4>Events</h4></li>
+            <li><a href="#">Event Calendar</a></li>
+            <li><a href="#">Event Registration</a></li>
+            <li><a href="#">Event Results</a></li>
+            <li><a href="#">Forms &amp; Contingency</a></li>
+            <li><a href="#">Cash Awards</a></li>
+            <li><a href="#">Rules</a></li>
+        </ul>
+    </div>
+  </div>
+  <div class="disclaimer">
+        <p>Not Affiliated with the National Aeronautics and Space Administration
+.  For that NASA, <a href="http://www.nasa.gov" class="disclaim" target="_blank"
+>click here.</a></p>        <p>National Office P.O. Box 21555 Richmond CA 94520&nbsp;&nbsp;|&nbsp;&nbsp;Ph: 510-232-NASA (6272)&nbsp;&nbsp;|&nbsp;&nbsp;Fax: 510-277-0657</p>
+  </div>
+</div>
