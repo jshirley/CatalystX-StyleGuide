@@ -41,8 +41,12 @@ MACRO ad_slot(zone, slot) BLOCK;
 END;
 
 MACRO run_widget(name, args) BLOCK;
-  SET w = widget.load(name, args);
-  INCLUDE "widgets/${w.template}" args = w.run(args);
+    SET w = widget.load(name, args);
+    IF w.template;
+    INCLUDE "widgets/${w.template}" args = w.run(args);
+    ELSE;
+        "Widget: $name not running (no template)";
+    END;
 END;
 
 MACRO select_field(info) BLOCK;

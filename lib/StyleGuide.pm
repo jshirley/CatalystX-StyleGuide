@@ -43,6 +43,26 @@ __PACKAGE__->config(
 # Start the application
 __PACKAGE__->setup();
 
+sub static_uri {
+    my ( $c, $asset, $query ) = @_;
+    my $static_path = $c->stash->{page}->{static_root} ||
+                        $c->view('TT')->config->{static_root} || '/static';
+    my $uri;
+    if ( $static_path =~ /^https?/ ) {
+        $static_path =~ s/\/$//;
+        $uri = URI->new( "$static_path/$asset" );
+        if ( ref $query eq 'HASH' ) {
+            $uri->query_form( $query );
+        }
+    } else {
+        if ( $query and $query eq 'HASH' ) {
+            $uri = $c->uri_for( $static_path, $asset, $query );
+        } else {
+            $uri = $c->uri_for( $static_path, $asset );
+        }
+    }
+    return $uri;
+}
 
 =head1 NAME
 
