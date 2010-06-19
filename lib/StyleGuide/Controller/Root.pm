@@ -72,6 +72,21 @@ Standard 404 error page
 
 sub default : Private {
     my ( $self, $c ) = @_;
+
+    my $design = $c->req->cookie('design');
+    if ( not $design ) {
+        $design = $c->view('StyleGuide')->default_style
+    } else {
+        $design = $c->view('StyleGuide')->get_design($design->value);
+    }
+    if ( $design ) {
+        my $path = $c->req->uri->path;
+            $path =~ s/^\///;
+        if ( -f "$design->{root}/$path.tt" ) {
+            $c->stash->{template} = "$path.tt";
+            return;
+        }
+    }
     $c->response->body( 'Page not found' );
     $c->response->status(404);
 }
