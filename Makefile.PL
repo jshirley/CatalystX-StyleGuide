@@ -17,6 +17,8 @@ requires 'Moose';
 requires 'namespace::autoclean';
 requires 'YAML::Syck';
 
+requires 'Template::Plugin::Digest::MD5';
+
 test_requires 'Test::More' => '0.88';
 catalyst;
 
